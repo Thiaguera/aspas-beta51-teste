@@ -1,0 +1,2 @@
+buildscript { configurations.classpath { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-reflect:1.9.23', 'org.jetbrains.kotlin:kotlin-stdlib:1.9.23', 'com.squareup:javapoet:1.13.0' } } }
+plugins { id 'com.android.application' version '8.7.2' apply false }

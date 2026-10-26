@@ -1,0 +1,34 @@
+{
+  "versionCode": 66062,
+  "versionName": "0.2.9-beta.51-conta-sem-cancelados",
+  "applicationId": "br.com.aspas.contingencia.beta51test",
+  "publicCopy": true,
+  "credentialsIncluded": false,
+  "originalApkIncluded": false,
+  "changes": [
+    "Contas reais substituídas por perfis fictícios sem PIN configurado",
+    "Nomes pessoais removidos",
+    "Hosts de impressora substituídos por endereços TEST-NET e impressoras desativadas",
+    "Testes históricos tornados portáteis; fontes funcionais não corrigidos nesta publicação"
+  ],
+  "sourceFiles": {
+    "settings.gradle": "d1fe4958d7d898e76722396e455a1e9d81e7bb1c3b441936b0292a270204eeff",
+    "build.gradle": "5a9c8970427236bb6f7ee455bc0d36db14f4e81348b32a0827cbf12b16822505",
+    "app/build.gradle": "a42059d440ee758d6669547c709e2bc96cde58513188d1f1b0ab802bd0b82c6b",
+    "app/src/main/assets/beta48-script.js": "ebce723639f4632c2d7b5ee28985f0d8294da97ea585fdea93cfc4367f81ecd8",
+    "app/src/main/assets/patch-printqueue.js": "03c0b8a385096afd74e8d5fd53b099728d2e9ef99c250a64c080d00e7784e37c",
+    "app/src/main/assets/patch-adjustments.js": "9b31d688ae61b80f5857506b555929098bb9d6663eb096cd81f5f42284fb89a4",
+    "app/src/main/assets/patch-pending-quantity.js": "0f78de16cb985341f7890135f9a573f371e17935442b36a5d2b7eaca582d2220",
+    "app/src/main/assets/patch-catalog.js": "d3401bb73ba8f7f9849fc72872e364cc639a60c9db64733fcbd52a91d331bf4b",
+    "app/src/main/assets/patch-sync.js": "db47292b4f40a936978fdc7d1465148ccd9a7bf73ea093681784a7f191df935a",
+    "app/src/main/assets/patch-security.js": "ffa2daa1eebab4e799027c22aa2802a26139a4b98768a026fabfb0d221c36f87",
+    "app/src/main/assets/patch-integration.js": "a01ebc2dae90c910ade37187e52df1dfc3e6890b86e0445392dda4ea59fdd4b2",
+    "app/src/main/assets/core-events.js": "ca1c71fad63a2035929212fb0cae4db1a24b90cd75a1ea5c0170a39b7f43366f",
+    "app/src/main/assets/index.html": "25f836e69427daec7e85e2d336e00f91611853f45403b2c4f3c5573287d01990",
+    "app/src/main/assets/patch-payments.js": "9fa83e22e0aebc4a346787439f77a88676605f1f42f52b313f6d98ab7f0ed421",
+    "app/src/main/assets/patch-conference.js": "cf554eeda2616db4d3f50471dd246972ed69e2b9978425f4bd4429d8ee119d71",
+    "app/src/main/assets/bootstrap-state.js": "cb388d3cfa9ad35e1b3a40d96eba2bf98133d9bbbf19d5547cc0dcfe951bfd6d",
+    "app/src/main/assets/storage-adapters.js": "73c11548cc1c9e30d758df4f08d8411733f6aa4150d7d493c9b5046e11fb139b",
+    "app/src/main/java/br/com/aspas/contingencia/MainActivity.java": "aaa9c74dc2ffec3b65bd832f24d28a20ca6434d4876cc3dfd793a521a79b019c"
+  }
+}

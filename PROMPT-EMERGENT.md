@@ -1,0 +1,11 @@
+Analise o projeto existente https://github.com/Thiaguera/aspas-beta51-teste. É o ASPAS Contingência Beta 51 teste, versionCode 66062, um PDV offline-first Android existente. Não quero criar um app novo nem migrar a tecnologia.
+
+Primeiro execute `node tools/restore-sources.cjs` para descompactar os fontes e imagens da cópia pública. Isso apenas restaura os arquivos originais sanitizados, sem corrigir ou alterar regras. Depois leia README.md, PUBLICACAO.json e docs/AUDITORIA-OFFLINE-HISTORICA.md. Inspecione app/src/main/assets, MainActivity.java, Manifest e Gradle. Mantenha HTML/CSS/JavaScript puro + Android Java/WebView, bridges e operação sem internet. Não usar React, Next.js, Flutter, Expo nem backend cloud.
+
+PRIMEIRA ENTREGA, SOMENTE ANÁLISE: não altere arquivos, não instale dependências sem necessidade, não faça deploy, não publique mudanças nem gere APK nesta etapa. Execute, se o ambiente permitir, node tests/verify-findings.js e node tests/reproduce-beta51-offline.js. O primeiro reproduz defeitos conhecidos: passar não significa que o produto está correto. Os harnesses têm stubs e não substituem Android real.
+
+Entregue os 5 problemas mais importantes em ordem de risco, com arquivo/linha, evidência, cenário de reprodução, correção mínima sugerida e teste de regressão. Priorize integridade de comandas, pagamentos, sincronização offline/reconexão, transferências/fechamentos concorrentes, recuperação após falha e impressão/cancelamento. Diferencie falha reproduzida, hipótese e dependência de teste físico. Analise os bloqueios históricos, não presuma que foram corrigidos.
+
+A cópia pública está sanitizada: usuários são fictícios sem PIN, impressoras desativadas e IPs TEST-NET. Isso é intencional, não um defeito novo. Se precisar de preview, use dados fictícios e tools/configure-demo.cjs apenas em cópia local; não commite PIN ou hash gerado. Não conecte impressoras ou rede de produção. Não conclua que TCP OK comprova impressão física única.
+
+Mostre o plano mínimo de correção e pare para minha aprovação. Se não conseguir compilar Java/Android neste ambiente, informe isso claramente e ainda faça a revisão dos fontes; não substitua o aplicativo por uma versão web. Seja objetivo para economizar créditos.
