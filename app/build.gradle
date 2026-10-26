@@ -1,0 +1,4 @@
+plugins { id 'com.android.application' }
+android { namespace 'br.com.aspas.contingencia'; compileSdk 35
+ defaultConfig { applicationId 'br.com.aspas.contingencia.beta51test'; minSdk 26; targetSdk 35; versionCode 66062; versionName '0.2.9-beta.51-conta-sem-cancelados' }
+}
