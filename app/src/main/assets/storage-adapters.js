@@ -1,0 +1,2 @@
+/* AtomicFile bridge. A configured adapter fails closed; never switches stores after error. */
+(function(g){'use strict';if(!g.AspasDurable)return;function read(k){let raw=g.AspasDurable.read(k);if(!raw)return null;return JSON.parse(raw)}function write(k,v){return g.AspasDurable.write(k,JSON.stringify(v))===true}g.AspasDomainStorage={read:()=>read('aspas-domain-v1'),write:v=>write('aspas-domain-v1',v)};g.AspasQueueStorage={read,write};})(window);

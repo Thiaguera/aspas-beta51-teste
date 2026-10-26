@@ -1,0 +1,1 @@
+<resources><string name="app_name">ASPAS Contingência</string><style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#7b4d35</item><item name="android:navigationBarColor">#fbf6ed</item></style></resources>
