@@ -1,0 +1,65 @@
+[
+  {
+    "path": "app/src/main/assets/beta48-script.js",
+    "parts": [
+      "source-parts/beta48-script.js.gz.b64.chunk00",
+      "source-parts/beta48-script.js.gz.b64.chunk01",
+      "source-parts/beta48-script.js.gz.b64.chunk02",
+      "source-parts/beta48-script.js.gz.b64.chunk03",
+      "source-parts/beta48-script.js.gz.b64.chunk04",
+      "source-parts/beta48-script.js.gz.b64.chunk05",
+      "source-parts/beta48-script.js.gz.b64.chunk06"
+    ]
+  },
+  {
+    "path": "app/src/main/assets/assets-aspas-logo.png.b64",
+    "parts": [
+      "source-parts/assets-aspas-logo.png.b64.gz.b64.chunk00",
+      "source-parts/assets-aspas-logo.png.b64.gz.b64.chunk01",
+      "source-parts/assets-aspas-logo.png.b64.gz.b64.chunk02",
+      "source-parts/assets-aspas-logo.png.b64.gz.b64.chunk03",
+      "source-parts/assets-aspas-logo.png.b64.gz.b64.chunk04"
+    ]
+  },
+  {
+    "path": "app/src/main/assets/patch-printqueue.js",
+    "parts": [
+      "source-parts/patch-printqueue.js.gz.b64.chunk00",
+      "source-parts/patch-printqueue.js.gz.b64.chunk01"
+    ]
+  },
+  {
+    "path": "app/src/main/assets/patch-sync.js",
+    "parts": [
+      "source-parts/patch-sync.js.gz.b64.chunk00",
+      "source-parts/patch-sync.js.gz.b64.chunk01"
+    ]
+  },
+  {
+    "path": "app/src/main/assets/patch-security.js",
+    "parts": [
+      "source-parts/patch-security.js.gz.b64.chunk00",
+      "source-parts/patch-security.js.gz.b64.chunk01"
+    ]
+  },
+  {
+    "path": "app/src/main/assets/core-events.js",
+    "parts": [
+      "source-parts/core-events.js.gz.b64.chunk00"
+    ]
+  },
+  {
+    "path": "app/src/main/assets/index.html",
+    "parts": [
+      "source-parts/index.html.gz.b64.chunk00",
+      "source-parts/index.html.gz.b64.chunk01",
+      "source-parts/index.html.gz.b64.chunk02"
+    ]
+  },
+  {
+    "path": "app/src/main/java/br/com/aspas/contingencia/MainActivity.java",
+    "parts": [
+      "source-parts/MainActivity.java.gz.b64.chunk00"
+    ]
+  }
+]
