@@ -11,47 +11,71 @@ permissions:
 
 jobs:
   navigation:
-    name: Build and navigate offline demo
+    name: Build and inspect offline demo
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Restore sanitized sources
+
+      - name: Restore and configure ephemeral demo
         shell: bash
         run: |
           set -euo pipefail
           node tools/restore-sources.cjs
-          python3 - <<'PY'
+          python3 - <<PY
           from pathlib import Path
-          for p in Path('app/src/main/assets').glob('*'):
-              if p.is_file() and p.suffix in {'.js', '.html'}:
-                  p.write_text(p.read_text().replace('Usuário demonstrativo 1 V. Pereira', 'Usuário demonstrativo 1'), encoding='utf-8')
+          for p in Path("app/src/main/assets").glob("*"):
+              if p.is_file() and p.suffix in {".js", ".html"}:
+                  p.write_text(p.read_text().replace("Usuário demonstrativo 1 V. Pereira", "Usuário demonstrativo 1"), encoding="utf-8")
           PY
           ASPAS_DEMO_PIN="$(shuf -i 100000-999999 -n 1)"
           echo "ASPAS_DEMO_PIN=$ASPAS_DEMO_PIN" >> "$GITHUB_ENV"
           export ASPAS_DEMO_PIN
           node tools/configure-demo.cjs >/dev/null
+          # This modifies only the restored runner copy. It is never committed or uploaded as an APK.
+          python3 - <<PY
+          from pathlib import Path
+          activities = list(Path("app").rglob("MainActivity.java"))
+          if len(activities) != 1:
+              raise SystemExit(f"expected exactly one MainActivity.java, found {len(activities)}")
+          p = activities[0]
+          text = p.read_text(encoding="utf-8")
+          marker = "super.onCreate(savedInstanceState);"
+          if text.count(marker) != 1:
+              raise SystemExit("onCreate marker missing or ambiguous")
+          p.write_text(text.replace(marker, marker + "\n        android.webkit.WebView.setWebContentsDebuggingEnabled(true);", 1), encoding="utf-8")
+          PY
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
-      - name: Set up Gradle 8.9
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
+          java-version: "17"
+
       - name: Configure Android SDK for ephemeral build
         shell: bash
         run: |
           set -euo pipefail
           echo "sdk.dir=$ANDROID_HOME" > local.properties
-          yes | sdkmanager --licenses >/dev/null
-          sdkmanager "platforms;android-35" "build-tools;35.0.0" >/dev/null
-      - name: Build debug APK locally
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -path "*/bin/sdkmanager" -print -quit)"
+          fi
+          test -n "$SDKMANAGER" && test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" >/dev/null
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Build ephemeral debug APK
         run: gradle --no-daemon assembleDebug
-      - name: Run offline navigation on Android emulator
+
+      - name: Run offline navigation and inspect WebView DOM
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
@@ -69,6 +93,32 @@ jobs:
             adb shell monkey -p br.com.aspas.contingencia.beta51test 1 >/dev/null
             sleep 5
             adb exec-out screencap -p > evidence/01-login.png
+            PID="$(adb shell pidof br.com.aspas.contingencia.beta51test | tr -d "\r")"
+            test -n "$PID"
+            SOCKET="$(adb shell cat /proc/net/unix | awk "/webview_devtools_remote/ {print \$NF}" | tail -n 1 | tr -d "\r")"
+            SOCKET="${SOCKET#@}"
+            test -n "$SOCKET"
+            adb forward tcp:9222 "localabstract:$SOCKET"
+            node <<NODE
+            const fs = require("fs");
+            (async () => {
+              const targets = await (await fetch("http://127.0.0.1:9222/json/list")).json();
+              const page = targets.find(t => t.type === "page" && t.webSocketDebuggerUrl);
+              if (!page) throw new Error("No inspectable WebView page target");
+              const ws = new WebSocket(page.webSocketDebuggerUrl);
+              const response = await new Promise((resolve, reject) => {
+                const timer = setTimeout(() => reject(new Error("DevTools protocol timeout")), 10000);
+                ws.onopen = () => ws.send(JSON.stringify({id: 1, method: "Runtime.evaluate", params: {expression: `JSON.stringify({title:document.title,readyState:document.readyState,url:location.protocol+"//"+location.host+location.pathname,interactive:[...document.querySelectorAll("button,a,input,select,textarea")].slice(0,80).map(e=>({tag:e.tagName,id:e.id||null,type:e.getAttribute("type"),role:e.getAttribute("role"),name:e.getAttribute("name"),className:e.className||null})),bodyClass:document.body.className||null})`, returnByValue: true}}));
+                ws.onmessage = event => { const m = JSON.parse(event.data); if (m.id === 1) { clearTimeout(timer); resolve(m); ws.close(); } };
+                ws.onerror = () => reject(new Error("DevTools WebSocket error"));
+              });
+              const value = response.result?.result?.value;
+              if (!value) throw new Error("DevTools returned no DOM summary");
+              const summary = JSON.parse(value);
+              if (summary.readyState !== "complete") throw new Error("WebView document not complete");
+              fs.writeFileSync("evidence/webview-dom-summary.json", JSON.stringify(summary, null, 2));
+            })().catch(error => { console.error(error.message); process.exit(1); });
+            NODE
             adb shell input tap 540 1040
             adb shell input text "$ASPAS_DEMO_PIN"
             adb shell input keyevent 66
@@ -88,11 +138,15 @@ jobs:
             test -s evidence/03-pedido.png
             test -s evidence/04-cozinha.png
             test -s evidence/05-config.png
+            test -s evidence/webview-dom-summary.json
+
       - name: Upload redacted navigation evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: android-navigation-evidence
-          path: evidence/*.png
+          path: |
+            evidence/*.png
+            evidence/webview-dom-summary.json
           if-no-files-found: warn
           retention-days: 7
