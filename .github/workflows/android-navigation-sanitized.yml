@@ -3,10 +3,8 @@ name: Android navigation demo (sanitized)
 on:
   workflow_dispatch:
   push:
-    branches:
-      - test/android-navigation-github-actions
-    paths:
-      - .github/workflows/android-navigation-sanitized.yml
+    branches: [test/android-navigation-github-actions]
+    paths: [.github/workflows/android-navigation-sanitized.yml]
 
 permissions:
   contents: read
@@ -44,6 +42,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Configure Android SDK for ephemeral build
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" >/dev/null
       - name: Build debug APK locally
         run: gradle --no-daemon assembleDebug
       - name: Run offline navigation on Android emulator
@@ -64,8 +69,6 @@ jobs:
             adb shell monkey -p br.com.aspas.contingencia.beta51test 1 >/dev/null
             sleep 5
             adb exec-out screencap -p > evidence/01-login.png
-            adb shell uiautomator dump /sdcard/login.xml >/dev/null
-            adb pull /sdcard/login.xml evidence/01-login.xml >/dev/null
             adb shell input tap 540 1040
             adb shell input text "$ASPAS_DEMO_PIN"
             adb shell input keyevent 66
