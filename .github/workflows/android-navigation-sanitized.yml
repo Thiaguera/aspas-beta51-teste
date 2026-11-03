@@ -2,6 +2,11 @@ name: Android navigation demo (sanitized)
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - test/android-navigation-github-actions
+    paths:
+      - .github/workflows/android-navigation-sanitized.yml
 
 permissions:
   contents: read
@@ -15,40 +20,32 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-
       - name: Restore sanitized sources
         shell: bash
         run: |
           set -euo pipefail
           node tools/restore-sources.cjs
-          # Remove the remaining abbreviated personal-looking demo label only in this ephemeral runner.
-          # This does not modify the repository, production sources, or any artifact.
           python3 - <<'PY'
           from pathlib import Path
           for p in Path('app/src/main/assets').glob('*'):
               if p.is_file() and p.suffix in {'.js', '.html'}:
                   p.write_text(p.read_text().replace('Usuário demonstrativo 1 V. Pereira', 'Usuário demonstrativo 1'), encoding='utf-8')
           PY
-          # A fresh random numeric PIN exists only in this job; it is never echoed, committed or uploaded.
           ASPAS_DEMO_PIN="$(shuf -i 100000-999999 -n 1)"
           echo "ASPAS_DEMO_PIN=$ASPAS_DEMO_PIN" >> "$GITHUB_ENV"
           export ASPAS_DEMO_PIN
           node tools/configure-demo.cjs >/dev/null
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
       - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-
       - name: Build debug APK locally
         run: gradle --no-daemon assembleDebug
-
       - name: Run offline navigation on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -69,15 +66,11 @@ jobs:
             adb exec-out screencap -p > evidence/01-login.png
             adb shell uiautomator dump /sdcard/login.xml >/dev/null
             adb pull /sdcard/login.xml evidence/01-login.xml >/dev/null
-            # The demo profile is preselected. Type the job-only PIN without printing it.
             adb shell input tap 540 1040
             adb shell input text "$ASPAS_DEMO_PIN"
             adb shell input keyevent 66
             sleep 4
             adb exec-out screencap -p > evidence/02-mesas.png
-            adb shell uiautomator dump /sdcard/mesas.xml >/dev/null
-            adb pull /sdcard/mesas.xml evidence/02-mesas.xml >/dev/null
-            # Navigation evidence only: no orders, payments, printing, sync, or configuration actions.
             adb shell input tap 165 1870
             sleep 2
             adb exec-out screencap -p > evidence/03-pedido.png
@@ -92,7 +85,6 @@ jobs:
             test -s evidence/03-pedido.png
             test -s evidence/04-cozinha.png
             test -s evidence/05-config.png
-
       - name: Upload redacted navigation evidence
         if: always()
         uses: actions/upload-artifact@v4
